@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>𒆜 TRIPLE T TRADER 𒆜</title>
+    <style>
+        body {
+            background-color: #0a0a0ae4;
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+        .neon-card {
+            background: linear-gradient(135deg, #1a1a1a, #222222cb);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgb(255, 0, 191), 0 0 30px #08e8de;
+            transition: 0.3s;
+        }
+        .neon-card:hover {
+            box-shadow: 0 0 20px rgb(255, 0, 140), 0 0 40px #d508e8;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: none;
+            background-color: #222;
+            color: #fff;
+            transition: 0.3s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            box-shadow: 0 0 10px #0ff;
+        }
+        .generate-btn {
+            background: linear-gradient(135deg, #0ff, #08e8de);
+            color: black;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .generate-btn:hover {
+            background: linear-gradient(135deg, #08e8de, #0ff);
+            transform: scale(1.05);
+        }
+        .loading {
+            color: #0ff;
+            font-size: 18px;
+            padding: 20px;
+        }
+        .error {
+            color: red;
+            padding: 10px;
+            background: rgba(255, 0, 0, 0.2);
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="neon-card">
+            <h2 align="center"><u>t.me/hr_bodda</u></h2>
+            
+            <form id="signalForm">
+                <div class="form-group">
+                    <label for="start">Start Time:</label>
+                    <input type="text" id="start" name="start" placeholder="e.g., 00:00" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="end">End Time:</label>
+                    <input type="text" id="end" name="end" placeholder="e.g., 23:59" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="duration">Days Analysis:</label>
+                    <input type="number" id="duration" name="duration" min="1" max="30" placeholder="e.g., 16" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="currency_pairs">Currency Pairs:</label>
+                    <input type="text" id="currency_pairs" name="currency_pairs" placeholder="e.g., BRLUSD_otc_bt,USDPKR_otc_bt,USDINR_otc_bt" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Operation Mode:</label>
+                    <select id="operation_mode" name="operation_mode" onchange="checkOperationMode()">
+                        <option value="normal">Normal</option>
+                        <option value="blackout">Blackout</option>
+                        <option value="flow">Flow SP</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="percentage_min">Minimum Percentage:</label>
+                    <input type="number" id="percentage_min" name="percentage_min" min="0" max="100" step="0.01" placeholder="e.g., 75" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="apply_filter">Apply Filter:</label>
+                    <select id="apply_filter" name="apply_filter">
+                        <option value="1">Advance</option>
+                        <option value="2">Normal</option>
+                        <option value="0">No</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="is_separate">Is Separate:</label>
+                    <select id="is_separate" name="is_separate">
+                        <option value="1">Yes</option>
+                        <option value="0">No</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <div id="backtest_restriction" class="error" style="display: none;">
+                        Backtest Advance Off para modo de operação de blackout e fluxo
+                    </div>
+                    <br>
+                    <label>Backtest Advanced:</label>
+                    <select id="backtest_advanced" name="backtest_advanced">
+                        <option value="off">Off</option>
+                        <option value="on">On</option>
+                    </select>
+                </div>
+                
+                <div class="form-group conditional-field">
+                    <label for="mtg">MTG:</label>
+                    <input type="number" id="mtg" name="mtg" min="0" placeholder="e.g., 1">
+                </div>
+                
+                <div class="form-group conditional-field">
+                    <label for="begin_date">Begin Date:</label>
+                    <input type="date" id="begin_date" name="begin_date">
+                </div>
+                
+                <div class="form-group conditional-field">
+                    <label for="finish_date">Finish Date:</label>
+                    <input type="date" id="finish_date" name="finish_date">
+                </div>
+                
+                <div class="form-group conditional-field">
+                    <label for="duplicate_remove">Duplicate Remove:</label>
+                    <select id="duplicate_remove" name="duplicate_remove">
+                        <option value="off">Off</option>
+                        <option value="on">On</option>
+                    </select>
+                </div>
+                
+                <div class="form-group conditional-field">
+                    <label for="percentage_adb">Percentage ADB:</label>
+                    <input type="number" id="percentage_adb" name="percentage_adb" min="-100" max="100" step="0.01" placeholder="e.g., 70">
+                </div>
+                
+                <button type="submit" class="generate-btn">Generate Signals!</button>
+            </form>
+            
+            <div id="response" style="display:none;">
+                <div class="loading">Loading signals...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+function checkOperationMode() {
+    const operationMode = document.getElementById('operation_mode').value;
+    const backtestSelect = document.getElementById('backtest_advanced');
+    const restrictionDiv = document.getElementById('backtest_restriction');
+    
+    if (operationMode === 'blackout' || operationMode === 'flow') {
+        backtestSelect.disabled = true;
+        backtestSelect.value = 'off';
+        restrictionDiv.style.display = 'block';
+        toggleFields();
+    } else {
+        backtestSelect.disabled = false;
+        restrictionDiv.style.display = 'none';
+    }
+}
+
+function toggleFields() {
+    const operationMode = document.getElementById('operation_mode').value;
+    const backtestAdvanced = document.getElementById('backtest_advanced').value === 'on';
+    const duplicateRemove = document.getElementById('duplicate_remove').value === 'on';
+    
+    console.log('Toggle Fields State:', {
+        operationMode,
+        backtestAdvanced,
+        duplicateRemove
+    });
+
+    const shouldShowFields = backtestAdvanced && 
+        operationMode !== 'blackout' && 
+        operationMode !== 'flow';
+
+    document.querySelectorAll('.conditional-field').forEach(field => {
+        field.style.display = shouldShowFields ? 'block' : 'none';
+    });
+    
+    const showPercentageADB = shouldShowFields && duplicateRemove;
+    document.getElementById('percentage_adb').parentElement.style.display = 
+        showPercentageADB ? 'block' : 'none';
+}
+
+document.getElementById('operation_mode').addEventListener('change', checkOperationMode);
+
+document.getElementById('backtest_advanced').addEventListener('change', function(e) {
+    console.log('Backtest Advanced Changed:', e.target.value);
+    toggleFields();
+});
+
+document.getElementById('duplicate_remove').addEventListener('change', function(e) {
+    console.log('Duplicate Remove Changed:', e.target.value);
+    toggleFields();
+});
+
+document.getElementById('signalForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const responseDiv = document.getElementById('response');
+    responseDiv.style.display = 'block';
+    responseDiv.innerHTML = '<div class="loading">Generating signals...</div>';
+
+    let apiUrl = `https://alltradingapi.com/signal_list_gen_vip/qx_api?start=${formData.get('start')}&end=${formData.get('end')}&duration=${formData.get('duration')}&currency_pairs=${formData.get('currency_pairs')}&operation_mode=${formData.get('operation_mode')}&percentage_min=${formData.get('percentage_min')}&apply_filter=${formData.get('apply_filter')}&is_separate=${formData.get('is_separate')}`;
+
+    if (formData.get('backtest_advanced') === 'on') {
+        apiUrl += `&backtest_advanced=on&mtg=${formData.get('mtg')}&begin_date=${formData.get('begin_date')}&finish_date=${formData.get('finish_date')}&duplicate_remove=${formData.get('duplicate_remove')}`;
+        
+        if (formData.get('duplicate_remove') === 'on') {
+            apiUrl += `&percentage_adb=${formData.get('percentage_adb')}`;
+        }
+    } else {
+        apiUrl += `&backtest_advanced=off`;
+    }
+
+    console.log('Request URL:', apiUrl);
+
+    fetch(apiUrl)
+        .then(response => {
+            console.log('Response Status:', response.status);
+            console.log('Response Headers:', Object.fromEntries(response.headers));
+            return response.json();
+        })
+        .then(data => {
+            console.log('Response Data:', data);
+            
+            if (Array.isArray(data) && data[0] && data[0].error) {
+                responseDiv.innerHTML = `
+                    <div class="error">
+                        ${data[0].error}
+                    </div>
+                `;
+                return;
+            }
+
+            if (data && data.error) {
+                responseDiv.innerHTML = `
+                    <div class="error">
+                        ${data.error}
+                    </div>
+                `;
+                return;
+            }
+
+            if (data && data.detalhes_execucao) {
+                console.log('Execution Details:', data.detalhes_execucao);
+                console.log('Signals:', data.signals);
+
+                responseDiv.innerHTML = `
+                    <div class="details">
+                        <h3>Execution Details</h3>
+                        <p>Execution Time: ${data.detalhes_execucao?.tempo_execucao || 'N/A'}</p>
+                        <p>Timezone: ${data.detalhes_execucao?.fuso_horario || 'N/A'}</p>
+                        <p>Date: ${data.detalhes_execucao?.data || 'N/A'}</p>
+                        <p>Creator: ${data.detalhes_execucao?.criador || 'N/A'}</p>
+                    </div>
+                    <div class="signals">
+                        <h3>Signals</h3>
+                        <ul>
+                            ${(data.signals || []).map(signal => {
+                                console.log('Processing Signal:', signal);
+                                return `
+                                    <li>
+                                        ${signal?.ativos || 'N/A'}
+                                        ${signal?.entrada ? ` - ${signal.entrada}` : ''}
+                                        ${signal?.direcao_principal ? ` - ${signal.direcao_principal}` : ''}
+                                        ${signal?.resultado_backtest?.direcao_geral ? ` - ${signal.resultado_backtest.direcao_geral}` : ''}
+                                        ${signal?.resultado_backtest?.precisao_geral ? ` - ${signal.resultado_backtest.precisao_geral}` : ''}
+                                    </li>
+                                `;
+                            }).join('')}
+                        </ul>
+                    </div>
+                `;
+                console.log('Render Complete');
+            } else {
+                throw new Error('Invalid response format');
+            }
+        })
+        .catch(error => {
+            console.error('Error Details:', {
+                message: error.message,
+                stack: error.stack,
+                timestamp: new Date().toISOString()
+            });
+
+            responseDiv.innerHTML = `
+                <div class="error">
+                    ${error.message}
+                </div>
+            `;
+        });
+});
+
+toggleFields();
+    </script>
+</body>
+</html>
